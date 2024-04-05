@@ -25,15 +25,15 @@ const Login = () => {
     const navigate = useNavigate();
     const onSubmit = async (userInfor) => {
         const response = await login({
-            tenDangNhap: userInfor.tenDangNhap,
-            matKhau: userInfor.matKhau
+            user_name: userInfor.tenDangNhap,
+            password: userInfor.matKhau
         });
-        if (response.error) {
-            alert('Tên Đăng Nhập Hoặc Mật Khẩu Không Đúng');
+        if (!response.data) {
+            alert(response.error.data.message);
             reset();
         }
         else {
-            alert('Đăng Nhập Thành Công');
+            alert(response.data.message);
             localStorage.setItem('accessToken',response.data.accessToken);
             navigate('/');
         }

@@ -14,6 +14,7 @@ import {
     ComeBack,
     Notice
 } from './registration.styles.js';
+
 const Registration = () => {
     const {
         register,
@@ -31,20 +32,20 @@ const Registration = () => {
     }
     const onSubmit = async (userInfor) => {
         const response = await registration({
-            hoTen: userInfor.hoTen,
-            dienThoai: userInfor.dienThoai,
-            email: userInfor.email,
-            diaChi: userInfor.diaChi,
-            tenCuaHang: userInfor.tenCuaHang,
-            tenDangNhap: userInfor.tenDangNhap,
-            matKhau: userInfor.matKhau
+            owner_name: userInfor.hoTen,
+            owner_phone: userInfor.dienThoai,
+            owner_email: userInfor.email,
+            owner_address: userInfor.diaChi,
+            owner_store: userInfor.tenCuaHang,
+            user_name: userInfor.tenDangNhap,
+            password: userInfor.matKhau
         })
-        if (response.error.originalStatus === 200) {
-            alert('Đăng Ký Thành Công');
+        if (response.data) {
+            alert(response.data.message);
             navigate('/login');
         }
         else {
-            alert('Tên Đăng Nhập Đã Tồn Tại');
+            alert(response.error.data.message);
         }
     }
     return (

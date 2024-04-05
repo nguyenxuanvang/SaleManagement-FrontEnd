@@ -59,7 +59,7 @@ const AddEmployee = ({ setIsOpenAddForm }) => {
                     {(errors.email) ? <Notice>!</Notice> : ``}
                 </DivContent>
                 <DivContent>
-                    <ContentSub isErrror={errors.tenDangNhap}>Tên Đăng Nhập:</ContentSub>
+                    <ContentSub isError={errors.tenDangNhap}>Tên Đăng Nhập:</ContentSub>
                     <ContentInput {...register("tenDangNhap", { required: true })} />
                     {(errors.tenDangNhap) ? <Notice>!</Notice> : ``}
                     <ContentSub>Địa Chỉ:</ContentSub>
