@@ -3,13 +3,7 @@ import { useEffect } from "react";
 const CheckIsLogin = () => {
     const navigate = useNavigate();
     useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-            navigate('/home');
-        }
-        else {
-            navigate('/login');
-        }
+        navigate('/home');
     },[]);
     return null;
 }

@@ -34,8 +34,9 @@ const Login = () => {
         }
         else {
             alert(response.data.message);
-            localStorage.setItem('accessToken',response.data.accessToken);
-            navigate('/');
+            setTimeout(()=>{
+                navigate('/home');
+            },500);
         }
     }
     return (

@@ -7,7 +7,7 @@ const productApi = apiSlice.injectEndpoints({
                 return undefined;
             },
             query: (args) => ({
-                url: '/products',
+                url: `/product/`,
                 params: args
             }),
         }),
@@ -22,8 +22,8 @@ const productApi = apiSlice.injectEndpoints({
                     const response = await queryFulfilled;
                     if(response.data) {
                         const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
-                            if(draft.length < 5) {
-                                draft.push(response.data);
+                            if(draft.data.length < 5) {
+                                draft.data.push(response.data.data);
                             }  
                         });
                         dispatch(action);

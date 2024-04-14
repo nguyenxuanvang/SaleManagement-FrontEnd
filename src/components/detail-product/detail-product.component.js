@@ -15,10 +15,11 @@ import {
 import Image from "../../images/kiotViett.jpg";
 import productApi from "../../redux/api/product-api.slice";
 const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) => {
+    console.log(product)
     const [deleteProduct] = productApi.useDeleteProductMutation();
     const [getProducts] = productApi.useLazyGetProductsQuery();
     const onDeleteProduct = async() => {
-        const response = await deleteProduct(product.maHang);
+        const response = await deleteProduct(product.category._id);
         if(response.data) {
             getProducts({page});
             alert('Xóa Thành Công!');
@@ -30,41 +31,41 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
     }
     return (
         <Form>
-            <Header>Thông Tin Chi Tiết Của Mặt Hàng {product.tenHang}</Header>
+            <Header>Thông Tin Chi Tiết Của Mặt Hàng {product.product_name}</Header>
             <ButtonTurnOff onClick={onTurnOffDetailForm}>X</ButtonTurnOff>
             <Body>
                 <div>
-                    <NameProduct>{product.tenHang}</NameProduct>
-                    <ImageProduct src={product.anh}></ImageProduct>
+                    <NameProduct>{product.product_name}</NameProduct>
+                    <ImageProduct src={product.image_url}></ImageProduct>
                 </div>
                 <div>
                     <DivContent>
                         <ContentSub>Mã Hàng:</ContentSub>
-                        <ContentInfor>{product.maHang}</ContentInfor>
+                        <ContentInfor>{product.category._id}</ContentInfor>
                     </DivContent>
                     <DivContent>
                         <ContentSub>Tên Hàng:</ContentSub>
-                        <ContentInfor>{product.tenHang}</ContentInfor>
+                        <ContentInfor>{product.product_name}</ContentInfor>
                     </DivContent>
                     <DivContent>
                         <ContentSub>Nhóm Hàng:</ContentSub>
-                        <ContentInfor>{product.nhomHang}</ContentInfor>
+                        <ContentInfor>{product.category.category_name}</ContentInfor>
                     </DivContent>
                     <DivContent>
-                        <ContentSub>Giá Vốn:</ContentSub>
-                        <ContentInfor>{product.giaVon}</ContentInfor>
+                        <ContentSub>Giá vốn:</ContentSub>
+                        <ContentInfor>{product.cost_price}</ContentInfor>
                     </DivContent>
                     <DivContent>
                         <ContentSub>Giá Bán:</ContentSub>
-                        <ContentInfor>{product.giaBan}</ContentInfor>
+                        <ContentInfor>{product.sale_price}</ContentInfor>
                     </DivContent>
                     <DivContent>
                         <ContentSub>Tồn Kho:</ContentSub>
-                        <ContentInfor>{product.tonKho}</ContentInfor>
+                        <ContentInfor>{product.quantity}</ContentInfor>
                     </DivContent>
                     <DivContent>
                         <ContentSub>Đơn Vị Tính:</ContentSub>
-                        <ContentInfor>{product.donViTinh}</ContentInfor>
+                        <ContentInfor>{product.unit}</ContentInfor>
                     </DivContent>
                 </div>
             </Body>

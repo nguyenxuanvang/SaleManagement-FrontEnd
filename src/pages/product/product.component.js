@@ -65,13 +65,15 @@ const Product = () => {
     const onSearch = () => {
         setSearch(searchRef.current.value);
         setCategory(categoryRef.current.value);
-        getProducts({search: searchRef.current.value,category: categoryRef.current.value});
+        getProducts({search: searchRef.current.value,categoryId: categoryRef.current.value});
         setPage(1);
     }
     const onNext = async() => {
-        const nextPage = page + 1;
-        await getProducts({page: nextPage,search,category});
-        setPage(nextPage);
+        if(data.data.length === 5) {
+            const nextPage = page + 1;
+            await getProducts({page: nextPage,search,category});
+            setPage(nextPage);
+        }
     }
     const onPrevious = async () => {
         const previousPage = page - 1;
@@ -94,8 +96,8 @@ const Product = () => {
                         setPage(1)
                     }}}>
                     <option></option>
-                    {categories.map(item => (
-                        <option>{item.tenNhomHang}</option>
+                    {categories.data?.map(item => (
+                        <option key={item._id} value={item._id}>{item.category_name}</option>
                     ))}
                 </SelectCategory>
                 <BtnSearch onClick={onSearch}>
@@ -104,7 +106,7 @@ const Product = () => {
                 <BtnAddEmp onClick={onOpenAddForm}>Thêm Hàng</BtnAddEmp>
             </Header>
             <PBody>
-                {(data.length !== 0) ? <HeaderBody>
+                {(data.data?.length !== 0) ? <HeaderBody>
                     <TitleHeader>Mã Hàng</TitleHeader>
                     <TitleHeader>Tên Hàng</TitleHeader>
                     <TitleHeader>Giá Bán</TitleHeader>
@@ -112,23 +114,23 @@ const Product = () => {
                     <TitleHeader>Tồn Kho</TitleHeader>
                 </HeaderBody> : <Alert>Không Có Sản Phẩm Nào</Alert>}
                  
-                {data.map(item => (
-                    <BodyBody key={item.maHang} onClick={() => {onOpenDetailForm(item)}}>
-                    <ContentBodyP>{item.maHang}</ContentBodyP>
-                    <ContentBodyP>{item.tenHang}</ContentBodyP>
-                    <ContentBodyP>{item.giaBan}</ContentBodyP>
-                    <ContentBodyP>{item.giaVon}</ContentBodyP>
-                    <ContentBodyP>{item.tonKho}</ContentBodyP>
+                {data.data?.map(item => (
+                    <BodyBody key={item._id} onClick={() => {onOpenDetailForm(item)}}>
+                    <ContentBodyP>{item._id}</ContentBodyP>
+                    <ContentBodyP>{item.product_name}</ContentBodyP>
+                    <ContentBodyP>{item.sale_price}</ContentBodyP>
+                    <ContentBodyP>{item.cost_price}</ContentBodyP>
+                    <ContentBodyP>{item.quantity    }</ContentBodyP>
                 </BodyBody>
                 ))}
             </PBody>
             <BtnDiv>
-                <BtnPrevious onClick={onPrevious} page={page}>Previous</BtnPrevious>
-                <BtnNext onClick={onNext} data={data.length}>Next</BtnNext>
+                {(page > 1) && <BtnPrevious onClick={onPrevious} page={page}>Previous</BtnPrevious>}
+                {(data.data?.length === 5) && <BtnNext onClick={onNext} data={data.length}>Next</BtnNext>}
             </BtnDiv>
             {(isOpenDetailForm) && <DetailProduct page={page} onTurnOffDetailForm={onTurnOffDetailForm} onOpenUpdateForm={onOpenUpdateForm} product={product}/>}
             {(isOpenUpdateForm) && <UpdateProduct onTurnOffUpdateForm={onTurnOffUpdateForm} onTurnOffDetailForm={onTurnOffDetailForm} product={product}/>}
-            {(isOpenAddForm) && <AddProduct onTurnOffAddForm={onTurnOffAddForm}/>}
+            {(isOpenAddForm) && <AddProduct categories={categories.data} onTurnOffAddForm={onTurnOffAddForm}/>}
         </section>
     );
 }

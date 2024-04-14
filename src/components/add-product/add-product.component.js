@@ -14,7 +14,7 @@ import {
 } from "../add-employee/add-employee.styles";
 import productApi from "../../redux/api/product-api.slice";
 import { ContentSubP } from "./add-product.style";
-const AddProduct = ({onTurnOffAddForm}) => {
+const AddProduct = ({onTurnOffAddForm, categories}) => {
     const [addProduct] = productApi.useAddProductMutation();
     const {
         register,
@@ -50,9 +50,10 @@ const AddProduct = ({onTurnOffAddForm}) => {
                 <ContentSub isError={errors.nhomHang}>Nhóm Hàng:</ContentSub>
                     <select {...register("nhomHang", { required: true })}>
                         <option></option>
-                        <option>TV</option>
-                        <option>Đồ Gia Dụng</option>
-                        <option>Thời Trang</option>
+                        {categories.map(item => (
+                            <option key={item._id} value={item._id}>{item.category_name}</option>
+                        ))}
+                        
                     </select>
                 {(errors.nhomHang) ? <Notice>!</Notice> : ``}
                 <ContentSubP isError={errors.giaBan}>Giá Bán:</ContentSubP>

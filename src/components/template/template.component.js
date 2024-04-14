@@ -24,11 +24,12 @@ const Template = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const {data:user = []} = userApi.useGetUserInforQuery();
-    const onLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('cart');
-        localStorage.removeItem('inputCart');
-        navigate('/');
+    const [logOut] = userApi.useLogoutMutation();
+    const onLogout = async() => {
+        const res =await logOut();
+        if(res.data) {
+            navigate('/login');
+        }
     }
     return (
         <Section>

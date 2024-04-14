@@ -91,16 +91,15 @@ export const Alert = styled.div`
     font-weight: 700;
 `;
 export const BtnDiv = styled.div`
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
+    position: relative;
 `;
 export const BtnNext = styled.button`
     font-size: 17px;
     font-weight: 700;
     padding: 5px;
     border-radius: 5px;
-    visibility: ${({data}) => (data === 0) ? `hidden` : `visible`};
+    position: absolute;
+    right: 5px;
     &:hover {
         cursor: pointer;
         opacity: 0.9;
@@ -112,6 +111,8 @@ export const BtnPrevious = styled.button`
     font-weight: 700;
     padding: 5px;
     border-radius: 5px;
+    position: absolute;
+    left: 5px;
     visibility: ${({page}) => (page === 1) ? `hidden` : `visible`};
     &:hover {
         cursor: pointer;
