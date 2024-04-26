@@ -16,3 +16,7 @@ export const SelectCategory = styled.select`
     border: 1px solid black;
     margin-right: 10px;
 `;
+export const Image = styled.img`
+    height: 100px;
+    width: 100px;
+`;

@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import {
     Form,
     Header,
@@ -12,19 +13,45 @@ import {
     BtnEmp,
     Notice
 } from "../add-employee/add-employee.styles";
+import {
+    Image,
+    ContentUpload,
+    ButtonUpload
+} from "../add-product/add-product.style";
 import { ContentSubP } from "../add-product/add-product.style";
-import { MaHang } from "./update-product-style";
+import { MaHang } from "./update-product.style";
 import productApi from "../../redux/api/product-api.slice";
+import catagoryApi from "../../redux/api/catagory-api-slice";
 const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
     const [updateProduct] = productApi.useUpdateProductMutation();
+    const {data: category = {}} = catagoryApi.useGetCategoriesQuery();
+    const fileRef = useRef(null);
+    const [file, setFile] = useState();
+    const [url, setUrl] = useState();
     const {
         register,
         handleSubmit,
         formState: { errors }
     } = useForm();
+    useEffect(()=>{
+        if(file) {
+            const previewUrl = URL.createObjectURL(file);
+            setUrl(previewUrl);
+        }
+    },[file]);
     const onUpdateProduct = async (newProduct) => {
-        newProduct.maHang = product.maHang;
-        const response = await updateProduct(newProduct);
+        const formData = new FormData();
+        if(file) {
+            if(file.type.split('/')[0] !== 'image') {
+                alert('Ảnh Không Đúng Định Dạng !');
+                return;
+            }
+            formData.append('image',file);
+        }
+        const changeProduct = {...newProduct,_id:product._id,image_url: product.image_url};
+        formData.append('product',JSON.stringify(changeProduct));
+        console.log(changeProduct);
+        const response = await updateProduct(formData);
         if(response.data) {
             alert('Cập Nhật Thành Công!');
             onTurnOffUpdateForm();
@@ -37,46 +64,47 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
     return (
         <Form onSubmit={handleSubmit(onUpdateProduct)}>
         <Header>
-            Cập Nhật Mặt Hàng {product.tenHang}
+            Cập Nhật Mặt Hàng {product.product_name}
         </Header>
         <ButtonTurnOff onClick={onTurnOffUpdateForm}>X</ButtonTurnOff>
         <Body>
             <DivContent>
-                <ContentSub isError={errors.maHang}>Mã Hàng:</ContentSub>
-                <MaHang>{product.maHang}</MaHang>
-                {(errors.maHang) ? <Notice>!</Notice> : ``}
-                <ContentSub isError={errors.giaVon}>Giá Vốn:</ContentSub>
-                <ContentInput {...register("giaVon", { required: true })} defaultValue={product.giaVon}/>
-                {(errors.giaVon) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors._id}>Mã Hàng:</ContentSub>
+                <MaHang>{product._id}</MaHang>
+                {(errors._id) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors.cost_price}>Giá Vốn:</ContentSub>
+                <ContentInput {...register("cost_price", { required: true })} defaultValue={product.cost_price}/>
+                {(errors.cost_price) ? <Notice>!</Notice> : ``}
             </DivContent>
             <DivContent>
-                <ContentSub isError={errors.tenHang}>Tên Hàng:</ContentSub>
-                <ContentInput {...register("tenHang", { required: true })} defaultValue={product.tenHang}/>
-                {(errors.tenHang) ? <Notice>!</Notice> : ``}
-                <ContentSub isError={errors.giaBan}>Giá Bán:</ContentSub>
-                <ContentInput {...register("giaBan", { required: true })} defaultValue={product.giaBan}/>
-                {(errors.giaBan) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors.product_name}>Tên Hàng:</ContentSub>
+                <ContentInput {...register("product_name", { required: true })} defaultValue={product.product_name}/>
+                {(errors.product_name) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors.sale_price}>Giá Bán:</ContentSub>
+                <ContentInput {...register("sale_price", { required: true })} defaultValue={product.sale_price}/>
+                {(errors.sale_price) ? <Notice>!</Notice> : ``}
             </DivContent>
             <DivContent>
-                <ContentSub isError={errors.nhomHang}>Nhóm Hàng:</ContentSub>
-                <select {...register("nhomHang", { required: true })} defaultValue={product.nhomHang}>
-                    <option></option>
-                    <option>TV</option>
-                    <option>Đồ Gia Dụng</option>
-                    <option>Thời Trang</option>
+                <ContentSub isError={errors.category}>Nhóm Hàng:</ContentSub>
+                <select {...register("category", { required: true })} defaultValue={product.category._id}>
+                    {category?.data?.map(item => (
+                        <option key={item._id} value={item._id}>{item.category_name}</option>
+                    ))}
                 </select>
-                {(errors.nhomHang) ? <Notice>!</Notice> : ``}
-                <ContentSubP isError={errors.tonKho}>Tồn Kho:</ContentSubP>
-                <ContentInput {...register("tonKho", { required: true })} defaultValue={product.tonKho}/>
-                {(errors.tonKho) ? <Notice>!</Notice> : ``}
+                {(errors.category) ? <Notice>!</Notice> : ``}
+                <ContentSubP isError={errors.quantity}>Tồn Kho:</ContentSubP>
+                <ContentInput {...register("quantity", { required: true })} defaultValue={product.quantity}/>
+                {(errors.quantity) ? <Notice>!</Notice> : ``}
             </DivContent>
             <DivContent>
-                <ContentSub isError={errors.anh}>Ảnh:</ContentSub>
-                <ContentInput {...register("anh", { required: true})} defaultValue={product.anh}/>
-                {(errors.anh) ? <Notice>!</Notice> : ``}
-                <ContentSub isError={errors.donViTinh}>Đơn Vị Tính:</ContentSub>
-                <ContentInput {...register("donViTinh", { required: true })} defaultValue={product.donViTinh}/>
-                {(errors.donViTinh) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors.image_url}>Ảnh:</ContentSub>
+                <Image src={(!url) ? `http://localhost:14722/${product.image_url}`: url}/>
+                <ContentUpload ref={fileRef} type='file' accept="image/*" onChange={(e)=>(e.target.files[0])&&setFile(e.target.files[0])}/>
+                <ButtonUpload onClick={(e)=>{e.preventDefault();fileRef.current.click()}}>Upload Ảnh</ButtonUpload>
+                {(errors.image_url) ? <Notice>!</Notice> : ``}
+                <ContentSub isError={errors.unit}>Đơn Vị Tính:</ContentSub>
+                <ContentInput {...register("unit", { required: true })} defaultValue={product.unit}/>
+                {(errors.unit) ? <Notice>!</Notice> : ``}
             </DivContent>
         </Body>
         <Footer>

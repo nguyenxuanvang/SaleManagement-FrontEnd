@@ -69,10 +69,12 @@ export const BodyBody = styled.div`
     }
 `;
 export const ContentBody = styled.p`
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 17px;
     padding: 10px;
     width: 380px;
-    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     border-right: 3px solid black;

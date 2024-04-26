@@ -22,6 +22,7 @@ const productApi = apiSlice.injectEndpoints({
                     const response = await queryFulfilled;
                     if(response.data) {
                         const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
+                            console.log(response.data.data)
                             if(draft.data.length < 5) {
                                 draft.data.push(response.data.data);
                             }  
@@ -97,13 +98,13 @@ const productApi = apiSlice.injectEndpoints({
             async onQueryStarted(maHang, { dispatch, queryFulfilled }) {
                 const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
                     let index = 0;
-                    for(let i = 0; i < draft.length; i += 1) {
-                        if(draft[i].maHang === Number(maHang)) {
+                    for(let i = 0; i < draft.data.length; i += 1) {
+                        if(draft.data[i].maHang === Number(maHang)) {
                             index = i;
                             break;
                         }
                     }
-                    draft.splice(index,1);
+                    draft.data.splice(index,1);
                 });
                 const patchResult = dispatch(action);
                 try {

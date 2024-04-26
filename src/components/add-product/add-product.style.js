@@ -6,3 +6,20 @@ export const ContentSubP = styled.p`
     margin-left: 165px;
     font-weight: 700;
 `;
+export const ContentUpload = styled.input`
+    width: 0px;
+    height: 0px;
+`;
+export const ButtonUpload = styled.button`
+    font-size: 14px;
+    padding: 3px;
+    border-radius: 10px;
+    background: #ccfffe;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+export const Image = styled.img`
+    height: 100px;
+    width: 100px;
+`;

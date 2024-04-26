@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import {
     Form,
     Header,
@@ -13,16 +14,28 @@ import {
     Notice
 } from "../add-employee/add-employee.styles";
 import productApi from "../../redux/api/product-api.slice";
-import { ContentSubP } from "./add-product.style";
+import { ContentSubP, ContentUpload, ButtonUpload, Image } from "./add-product.style";
 const AddProduct = ({onTurnOffAddForm, categories}) => {
     const [addProduct] = productApi.useAddProductMutation();
+    const [file,setFile] = useState();
+    const [url, setUrl] = useState();
     const {
         register,
         handleSubmit,
         formState: { errors }
     } = useForm();
+    const fileRef = useRef(null);
     const onAddProduct = async (product) => {
-        const response = await addProduct(product);
+        const formData = new FormData();
+        if(file) {
+            if(file.type.split('/')[0] !== 'image') {
+                alert('Ảnh Không Đúng Định Dạng !');
+                return;
+            }
+            formData.append('image',file);
+        }
+        formData.append('product',JSON.stringify(product));
+        const response = await addProduct(formData);
         if(response.data) {
             alert('Thêm Thành Công!');
             onTurnOffAddForm();
@@ -30,6 +43,16 @@ const AddProduct = ({onTurnOffAddForm, categories}) => {
         else {
             alert('Thêm Thất Bại!');  
         }
+    }
+    useEffect(()=>{
+        if(file) {
+            const url = URL.createObjectURL(file);
+            setUrl(url);
+        }
+    },[file]);
+    const onUpload = (e) => {
+        e.preventDefault();
+        fileRef.current.click();
     }
     return (
         <Form onSubmit={handleSubmit(onAddProduct)}>
@@ -62,8 +85,9 @@ const AddProduct = ({onTurnOffAddForm, categories}) => {
             </DivContent>
             <DivContent>
                 <ContentSub isError={errors.anh}>Ảnh:</ContentSub>
-                <ContentInput {...register("anh", { required: true})}/>
-                {(errors.anh) ? <Notice>!</Notice> : ``}
+                {(url) && <Image src={(url) ? url : ''}/>}
+                <ContentUpload type="file" accept="image/*" ref={fileRef} onChange={(e)=>(e.target.files[0])&&setFile(e.target.files[0])}/>
+                <ButtonUpload onClick={(e)=>onUpload(e)}>Upload Ảnh</ButtonUpload>
                 <ContentSub isError={errors.tonKho}>Tồn Kho:</ContentSub>
                 <ContentInput type='number' {...register("tonKho", { required: true })}/>
                 {(errors.tonKho) ? <Notice>!</Notice> : ``}

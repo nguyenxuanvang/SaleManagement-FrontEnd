@@ -15,11 +15,10 @@ import {
 import Image from "../../images/kiotViett.jpg";
 import productApi from "../../redux/api/product-api.slice";
 const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) => {
-    console.log(product)
     const [deleteProduct] = productApi.useDeleteProductMutation();
     const [getProducts] = productApi.useLazyGetProductsQuery();
     const onDeleteProduct = async() => {
-        const response = await deleteProduct(product.category._id);
+        const response = await deleteProduct(product._id);
         if(response.data) {
             getProducts({page});
             alert('Xóa Thành Công!');
@@ -36,7 +35,7 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
             <Body>
                 <div>
                     <NameProduct>{product.product_name}</NameProduct>
-                    <ImageProduct src={product.image_url}></ImageProduct>
+                    <ImageProduct src={`http://localhost:14722/${product.image_url}`}></ImageProduct>
                 </div>
                 <div>
                     <DivContent>
