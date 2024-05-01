@@ -94,6 +94,7 @@ export const Alert = styled.div`
 `;
 export const BtnDiv = styled.div`
     position: relative;
+    margin-top: 15px;
 `;
 export const BtnNext = styled.button`
     font-size: 17px;

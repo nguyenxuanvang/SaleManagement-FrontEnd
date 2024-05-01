@@ -35,26 +35,33 @@ const productApi = apiSlice.injectEndpoints({
             }
         }),
         updateProduct: builder.mutation({
-            query: product => ({
+            query: formData => ({
                 url: '/product',
                 method: 'PATCH',
-                body: product
+                body: formData
             }),
-            async onQueryStarted(product, { dispatch, queryFulfilled }) {
-                const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
-                    for(let i = 0; i < draft.length; i += 1) {
-                        if(draft[i].maHang === Number(product.maHang)) {
-                            draft[i] = product;
-                            break;
-                        }
-                    }
-                });
-                const patchResult = dispatch(action);
+            async onQueryStarted(formData, { dispatch, queryFulfilled }) {
                 try {
-                    await queryFulfilled;
-                } catch {
-                    patchResult.undo();
-                }
+                    const response = await queryFulfilled;
+                    if(response.data) {
+                        const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
+                            const product = response.data.data;
+                            let findProduct = draft.data.find(item=>item._id===product._id);
+                            findProduct.category = product.category;
+                            findProduct.cost_price = product.cost_price;
+                            findProduct.image_url = product.image_url;
+                            findProduct.owner = product.owner;
+                            findProduct.product_name = product.product_name;
+                            findProduct.quantity = product.quantity;
+                            findProduct.sale_price = product.sale_price;
+                            findProduct.unit = product.unit;
+                            findProduct.updatedAt = product.updatedAt;
+                        });
+                        dispatch(action);
+                    }
+                } catch(e) {
+                    console.log(e);
+                }  
             }
         }),
         updateProducts: builder.mutation({
@@ -90,20 +97,14 @@ const productApi = apiSlice.injectEndpoints({
             })
         }),
         deleteProduct: builder.mutation({
-            query: maHang => ({
+            query: id => ({
                 url: '/product',
                 method: 'DELETE',
-                body: {maHang}
+                body: {id}
             }),
-            async onQueryStarted(maHang, { dispatch, queryFulfilled }) {
+            async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
-                    let index = 0;
-                    for(let i = 0; i < draft.data.length; i += 1) {
-                        if(draft.data[i].maHang === Number(maHang)) {
-                            index = i;
-                            break;
-                        }
-                    }
+                    const index = draft.data.findIndex(item=>item._id===id);
                     draft.data.splice(index,1);
                 });
                 const patchResult = dispatch(action);

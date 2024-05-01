@@ -50,7 +50,6 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
         }
         const changeProduct = {...newProduct,_id:product._id,image_url: product.image_url};
         formData.append('product',JSON.stringify(changeProduct));
-        console.log(changeProduct);
         const response = await updateProduct(formData);
         if(response.data) {
             alert('Cập Nhật Thành Công!');

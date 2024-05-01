@@ -41,7 +41,6 @@ const Product = () => {
     const [page, setPage] = useState(1);
     const searchRef = useRef(null);
     const categoryRef = useRef(null);
-    console.log(data)
     useEffect(()=>{
         getProducts();
     },[]);

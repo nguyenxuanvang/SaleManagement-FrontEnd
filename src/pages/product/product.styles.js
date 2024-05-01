@@ -4,7 +4,7 @@ import {
     Body
 } from "../employee/employee.styles";
 export const PBody = styled(Body)`
-    height: 300px;    
+    height: auto;
 `;
 export const ContentBodyP = styled(ContentBody)`
 &:last-child {
