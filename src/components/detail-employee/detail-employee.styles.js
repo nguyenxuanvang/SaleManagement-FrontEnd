@@ -1,8 +1,11 @@
-import { styled } from "styled-components";
+import { keyframes, styled } from "styled-components";
 import { 
     BtnTurnOff,
-    BtnEmployee
+    BtnEmployee,
+    AnimateIn,
+    AnimateOut
 } from "../common-components/common-components.styles";
+
 export const Form = styled.div`
     position: fixed;
     top: 10%;
@@ -11,6 +14,7 @@ export const Form = styled.div`
     background-color: #e9abab;
     width: 1000px;
     border: 3px solid black;
+    animation: ${({open}) => {return open ?AnimateIn:AnimateOut}} 0.5s ease forwards;
 `;
 export const Header = styled.p`
     font-size: 20px;
@@ -37,7 +41,7 @@ export const ContentInfor = styled.p`
     font-weight: 700;
     font-size: 18px;
     &:last-child {
-        color: ${({status}) => (status === true) ? `#15b815;` : (status === false) ? `red;` : ``}
+        color: ${({status}) => (status === 'true') ? `#15b815;` : (status === 'false') ? `red;` : ``}
     }
 `;
 export const Footer = styled.div`

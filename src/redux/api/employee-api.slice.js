@@ -1,3 +1,4 @@
+import { current } from "@reduxjs/toolkit";
 import apiSlice from "./api.slice";
 const employeeApi = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -6,8 +7,16 @@ const employeeApi = apiSlice.injectEndpoints({
                 return undefined;
             },
             query: (args) => ({
-                url: '/employees',
+                url: '/employee',
                 params: args
+            })
+        }),
+        getRoles: builder.query({
+            serializeQueryArgs: () => {
+                return undefined;
+            },
+            query: () => ({
+                url: '/employee/role',
             })
         }),
         addEmployee: builder.mutation({
@@ -21,15 +30,15 @@ const employeeApi = apiSlice.injectEndpoints({
                     const response = await queryFulfilled;
                     if(response.data) {
                         const action = apiSlice.util.updateQueryData('getEmployees', undefined, draft => {
-                            if(draft.length < 5) {
-                                draft.push(response.data);
+                            if(draft.data.length < 5) {
+                                draft.data.push(response.data.data);
                             }
                         });
                         dispatch(action);
                     }
-                } catch {
-
-                }
+                } catch(e) {
+                    console.log(e);
+                }  
             }
         }),
         updateEmployee: builder.mutation({
@@ -39,41 +48,30 @@ const employeeApi = apiSlice.injectEndpoints({
                 body: employee
             }),
             async onQueryStarted(employee, { dispatch, queryFulfilled }) {
-                const action = apiSlice.util.updateQueryData('getEmployees', undefined, draft => {
-                    for (let i = 0; i < draft.length; i += 1) {
-                        if (draft[i].id === employee.id) {
-                            draft[i] = employee;
-                            break;
-                        }
-                    }
-                });
-                const patchResult = dispatch(action);
                 try {
-                    await queryFulfilled;
-                } catch {
-                    patchResult.undo();
-                }
+                    const response = await queryFulfilled;
+                    if(response.data) {
+                        const action = apiSlice.util.updateQueryData('getEmployees', undefined, draft => {
+                            let findEmployeeIndex = draft.data.findIndex(item => item._id === response.data.data._id);
+                            draft.data[findEmployeeIndex] = response.data.data;
+                        });
+                        dispatch(action);
+                    }
+                } catch(e) {
+                    console.log(e);
+                }  
             }
         }),
         deleteEmployee: builder.mutation({
             query: id => ({
-                url: '/employee',
+                url: `/employee/${id}`,
                 method: 'DELETE',
-                body: { id }
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const action = apiSlice.util.updateQueryData('getEmployees', undefined, draft => {
-                    let index = 0;
-                    for (let i = 0; i < draft.length; i += 1) {
-                        if (draft[i].id === id) {
-                            index = i;
-                            break;
-                        }
-                    }
-                    draft.splice(index, 1);
-                    for (let i = index; i < draft.length; i += 1) {
-                        draft[i].id -= 1;
-                    }
+                    const index = draft.data.findIndex(item => item._id === id);
+                    draft.data.splice(index, 1);
+                    
                 });
                 const patchResult = dispatch(action);
                 try {

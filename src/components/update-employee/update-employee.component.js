@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import {v4 as uuid} from "uuid";
 import employeeApi from "../../redux/api/employee-api.slice";
 import {
     Form,
@@ -14,83 +14,112 @@ import {
     BtnEmp,
     Notice
 } from "../add-employee/add-employee.styles";
-const UpdateEmployee = ({setIsOpenUpdateForm,setIsOpenDetailForm,employee}) => {
+import {
+    OverLay,
+    Spinner
+} from "../common-components/common-components.styles";
+import { useState } from "react";
+const UpdateEmployee = ({setIsOpenUpdateForm,setIsOpenDetailForm,employee, handleAlert}) => {
     const [updateEmployee] = employeeApi.useUpdateEmployeeMutation();
+    const {data} = employeeApi.useGetRolesQuery();
+    const [isOpen, setIsOpen] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const {
         register,
         handleSubmit,
         formState: { errors }
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            role: employee.role.role_name
+        }
+    });
     const confirmPassword = (pass, userInfor) => {
-        if (userInfor.matKhau !== pass) {
+        if (userInfor.password !== pass) {
             return 'Mật Khẩu Không Trùng Khớp';
         }
         return true;
     }
-    const onTurnOffForm = () => {
-        setIsOpenUpdateForm(false);
+    const onTurnOffForm = (e) => {
+        e.preventDefault();
+        setTimeout(()=>{
+            setIsOpenUpdateForm(false);
+        },500);
+        setIsOpen(false);
     }
     const onComeBack = () => {
         setIsOpenUpdateForm(false);
         setIsOpenDetailForm(true);
     }
     const onUpdateEmployee = async (newEmployee) => {
-        delete newEmployee.reMatKhau;
+        setIsLoading(true);
+        delete newEmployee.rePass;
         const response = await updateEmployee({
             ...newEmployee,
-            id: employee.id,
-            trangThai: employee.trangThai
-        })
+            _id: employee._id
+        });
+        setIsLoading(false);
         if(response.data) {
-            alert('Cập Nhật Thành Công');
+            handleAlert(response.data.message);
             setIsOpenUpdateForm(false);
         }
         else {
-            alert('Trùng Tên Đăng Nhập');
+            handleAlert(response.error.data.message,'error');
         }
     }
     return(
-        <Form onSubmit={handleSubmit(onUpdateEmployee)}>
+        <>
+        {(isLoading) && 
+            <OverLay>
+                <Spinner/>
+                <p style={{color: '#fff'}}>Loading...</p>
+            </OverLay>
+        }
+        
+        <Form open={isOpen} onSubmit={handleSubmit(onUpdateEmployee)}>
             <Header>
-                Cập Nhật Tài Khoản Nhân Viên {employee.tenNguoiDung}
+                Cập Nhật Tài Khoản Nhân Viên {employee.name}
             </Header>
-            <ButtonTurnOff onClick={onTurnOffForm}>X</ButtonTurnOff>
+            <ButtonTurnOff onClick={(e) => onTurnOffForm(e)}>X</ButtonTurnOff>
             <Body>
                 <DivContent>
-                    <ContentSub isError={errors.tenNguoiDung}>Tên Người Dùng:</ContentSub>
-                    <ContentInput {...register("tenNguoiDung", { required: true })} defaultValue={employee.tenNguoiDung}/>
-                    {(errors.tenNguoiDung) ? <Notice>!</Notice> : ``}
+                    <ContentSub isError={errors.name}>Tên Người Dùng:</ContentSub>
+                    <ContentInput {...register("name", { required: true })} defaultValue={employee.name}/>
+                    {(errors.name) ? <Notice>!</Notice> : ``}
                     <ContentSub isError={errors.email}>Email:</ContentSub>
                     <ContentInput {...register("email", { required: true, pattern: { value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/ } })} defaultValue={employee.email} />
                     {(errors.email) ? <Notice>!</Notice> : ``}
                 </DivContent>
                 <DivContent>
-                    <ContentSub isErrror={errors.tenDangNhap}>Tên Đăng Nhập:</ContentSub>
-                    <ContentInput {...register("tenDangNhap", { required: true })} defaultValue={employee.tenDangNhap}/>
-                    {(errors.tenDangNhap) ? <Notice>!</Notice> : ``}
+                    <ContentSub isErrror={errors.user_name}>Tên Đăng Nhập:</ContentSub>
+                    <ContentInput {...register("user_name", { required: true })} defaultValue={employee.user_name}/>
+                    {(errors.user_name) ? <Notice>!</Notice> : ``}
                     <ContentSub>Địa Chỉ:</ContentSub>
-                    <ContentInput {...register("diaChi")} defaultValue={employee.diaChi}/>
+                    <ContentInput {...register("address")} defaultValue={employee.address}/>
                 </DivContent>
                 <DivContent>
-                    <ContentSub isError={errors.matKhau}>Mật Khẩu:</ContentSub>
-                    <ContentInput type="password" {...register("matKhau", { required: true })} defaultValue={employee.matKhau}/>
-                    {(errors.matKhau) ? <Notice>!</Notice> : ``}
+                    <ContentSub isError={errors.password}>Mật Khẩu:</ContentSub>
+                    <ContentInput type="password" {...register("password", { required: true })}/>
+                    {(errors.password) ? <Notice>!</Notice> : ``}
                     <ContentSub>Ngày Sinh:</ContentSub>
-                    <ContentInput {...register("ngaySinh")} defaultValue={employee.ngaySinh}/>
+                    <ContentInput {...register("birthday")} defaultValue={employee.birthday}/>
                 </DivContent>
                 <DivContent>
-                    <ContentSub isError={errors.reMatKhau}>Nhập Lại Mật Khẩu:</ContentSub>
-                    <ContentInput type="password" {...register("reMatKhau", { required: true, validate: confirmPassword })} defaultValue={employee.matKhau}/>
-                    {(errors.reMatKhau) ? <Notice>!</Notice> : ``}
+                    <ContentSub isError={errors.rePass}>Nhập Lại Mật Khẩu:</ContentSub>
+                    <ContentInput type="password" {...register("rePass", { required: true, validate: confirmPassword })}/>
+                    {(errors.rePass) ? <Notice>!</Notice> : ``}
                     <ContentSub>Điện Thoại:</ContentSub>
-                    <ContentInput {...register("dienThoai")} defaultValue={employee.dienThoai}/>
+                    <ContentInput {...register("phone")} defaultValue={employee.phone}/>
                 </DivContent>
                 <DivContent>
-                    <ContentSub isError={errors.vaiTro}>Vai Trò:</ContentSub>
-                    <ContentInput {...register("vaiTro", { required: true })} defaultValue={employee.vaiTro}/>
-                    {(errors.vaiTro) ? <Notice>!</Notice> : ``}
+                    <ContentSub isError={errors.role}>Vai Trò:</ContentSub>
+                    <select {...register("role", { required: true })}>
+                    {data?.data?.map(item => (
+                        <option key={item._id} selected={(item.role_name===employee.role.role_name)?true:false} value={item.role_name}>{item.role_name}</option>
+                    ))}
+                    </select>
+                    {(errors.role) ? <Notice>!</Notice> : ``}
                     <ContentSub>Ghi Chú:</ContentSub>
-                    <ContentInput {...register("ghiChu")} defaultValue={employee.ghiChu}/>
+                    <ContentInput {...register("note")} defaultValue={employee.note}/>
                 </DivContent>
             </Body>
             <Footer>
@@ -98,6 +127,7 @@ const UpdateEmployee = ({setIsOpenUpdateForm,setIsOpenDetailForm,employee}) => {
                 <BtnEmp>Cập Nhật</BtnEmp>
             </Footer>
         </Form>
+        </>
     );
 }
 export default UpdateEmployee;

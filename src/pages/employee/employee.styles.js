@@ -82,7 +82,7 @@ export const ContentBody = styled.p`
         border-left: 3px solid black;
     }
     &:last-child {
-        color: ${({active}) => (active) ? `#15b815;` : `#2d2a2a;`}
+        color: ${({active}) => (active==='true') ? `#15b815;` : `#2d2a2a;`}
         font-weight: 600;
     }
 `;

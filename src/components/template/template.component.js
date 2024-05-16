@@ -46,7 +46,7 @@ const Template = () => {
                     <User>
                         <ImageUser src={userIcon} alt="Avt"/>
                     </User>
-                    <NameUser>{(user.hoTen) ? user.hoTen.split(' ')[user.hoTen.split(' ').length-1] : ``}</NameUser>
+                    <NameUser>{(user.owner_name) ? user.owner_name.split(' ')[user.owner_name.split(' ').length-1] : ``}</NameUser>
                 </SectionUser>
                 <Icon src={settingIcon}/>
                 <PopUpSetting onClick={onLogout}>

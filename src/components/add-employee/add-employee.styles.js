@@ -2,7 +2,9 @@ import { styled } from "styled-components";
 import { 
     NoticeForm,
     BtnTurnOff,
-    BtnEmployee
+    BtnEmployee,
+    AnimateIn,
+    AnimateOut
 } from "../common-components/common-components.styles";
 export const Form = styled.form`
     position: fixed;
@@ -12,6 +14,7 @@ export const Form = styled.form`
     background-color: #e9abab;
     width: 1000px;
     border: 3px solid black;
+    animation: ${({open}) => {return open ?AnimateIn:AnimateOut}} 0.5s ease forwards;
 `;
 export const Header = styled.p`
     font-size: 20px;

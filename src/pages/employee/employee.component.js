@@ -19,11 +19,13 @@ import {
     BtnNext,
     BtnPrevious
 } from "./employee.styles";
+import { Alert as Notice } from "antd";
 import AddEmployee from "../../components/add-employee/add-employee.component";
 import DetailEmployee from "../../components/detail-employee/detail-employee.component";
 import UpdateEmployee from "../../components/update-employee/update-employee.component";
 import searchIcon from "../../icons/search.png";
 import employeeApi from "../../redux/api/employee-api.slice";
+
 const Employee = () => {
     const [isOpenAddForm, setIsOpenAddForm] = useState(false);
     const [isOpenDetailForm, setIsOpenDetailForm] = useState(false);
@@ -33,6 +35,9 @@ const Employee = () => {
     const [getEmployees, {data = []}] = employeeApi.useLazyGetEmployeesQuery();
     const [employee, setEmployee] = useState();
     const searchRef = useRef(null);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('success')
     useEffect(()=>{
         getEmployees();
     },[]);
@@ -58,10 +63,18 @@ const Employee = () => {
         getEmployees({page: previousPage,search});
         setPage(previousPage);
     }
+    const handleAlert = (message, type="success") => {
+        setAlertMessage(message)
+        setOpenAlert(true);
+        setAlertType(type);
+        setTimeout(()=>{
+            setOpenAlert(false);
+        },3000);
+    }
     return (
         <section>
             <Header>
-                <SearchEmp ref={searchRef} placeholder="Tìm Kiếm Nhân Viên" onChange={(e) => {
+                <SearchEmp ref={searchRef} placeholder="Tìm Kiếm Tên Nhân Viên" onChange={(e) => {
                     if(e.target.value==='') {
                         setSearch('');
                         getEmployees();
@@ -73,7 +86,7 @@ const Employee = () => {
                 <BtnAddEmp onClick={onOpenAddForm}>Thêm Nhân Viên</BtnAddEmp>
             </Header>
             <Body>
-                {(data.length === 0) ? <Alert>Không Có Nhân Viên Nào</Alert> :
+                {(data?.data?.length === 0) ? <Alert>Không Có Nhân Viên Nào</Alert> :
                  <HeaderBody>
                     <TitleHeader>Tên Đăng Nhập</TitleHeader>
                     <TitleHeader>Tên Nhân Viên</TitleHeader>
@@ -81,22 +94,28 @@ const Employee = () => {
                     <TitleHeader>Trạng Thái</TitleHeader>
                 </HeaderBody>
                 }
-                {data.map(item => (
-                    <BodyBody key={item.id} onClick={() => onOpenDetailForm(item)}>
-                        <ContentBody>{item.tenDangNhap}</ContentBody>
-                        <ContentBody>{item.tenNguoiDung}</ContentBody>
-                        <ContentBody>{(item.dienThoai) ? item.dienThoai : `Chưa Cập Nhật`}</ContentBody>
-                        <ContentBody active={item.trangThai}>{(item.trangThai) ? `Đang Hoạt Động` : `Ngưng Hoạt Động`}</ContentBody>
+                {data?.data?.map(item => (
+                    <BodyBody key={item._id} onClick={() => onOpenDetailForm(item)}>
+                        <ContentBody>{item.user_name}</ContentBody>
+                        <ContentBody>{item.name}</ContentBody>
+                        <ContentBody>{(item.phone) ? item.phone : `Chưa Cập Nhật`}</ContentBody>
+                        <ContentBody active={item.status}>{(item.status==='true') ? `Đang Hoạt Động` : `Ngưng Hoạt Động`}</ContentBody>
                     </BodyBody>
                 ))}
             </Body>
             <BtnDiv>
-                <BtnPrevious page={page} onClick={onPrevious}>Previous</BtnPrevious>
-                <BtnNext data={data.length} onClick={onNext}>Next</BtnNext>
+                {
+                    (page === 2) && <BtnPrevious page={page} onClick={onPrevious}>Previous</BtnPrevious>
+                }
+                
+                {
+                    (data?.data?.length === 5) && <BtnNext onClick={onNext}>Next</BtnNext>
+                }
             </BtnDiv>
-            {(isOpenAddForm) && <AddEmployee setIsOpenAddForm={setIsOpenAddForm}/>}
-            {(isOpenDetailForm) && <DetailEmployee page={page} setIsOpenDetailForm={setIsOpenDetailForm} setIsOpenUpdateForm={setIsOpenUpdateForm} employee={employee}/>}
-            {(isOpenUpdateForm) && <UpdateEmployee setIsOpenUpdateForm={setIsOpenUpdateForm} setIsOpenDetailForm={setIsOpenDetailForm} employee={employee}/>}
+            {(isOpenAddForm) && <AddEmployee setIsOpenAddForm={setIsOpenAddForm} handleAlert={handleAlert}/>}
+            {(isOpenDetailForm) && <DetailEmployee page={page} setIsOpenDetailForm={setIsOpenDetailForm} setIsOpenUpdateForm={setIsOpenUpdateForm} employee={employee} handleAlert={handleAlert}/>}
+            {(isOpenUpdateForm) && <UpdateEmployee setIsOpenUpdateForm={setIsOpenUpdateForm} setIsOpenDetailForm={setIsOpenDetailForm} employee={employee} handleAlert={handleAlert}/>}
+            {(openAlert) && <Notice style={{position: 'fixed',top:'30px',right:'20px'}} message={alertMessage} type={alertType} showIcon />}
         </section>
     );
 }
