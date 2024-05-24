@@ -55,7 +55,8 @@ const UpdateEmployee = ({setIsOpenUpdateForm,setIsOpenDetailForm,employee, handl
         delete newEmployee.rePass;
         const response = await updateEmployee({
             ...newEmployee,
-            _id: employee._id
+            _id: employee._id,
+            status: employee.status
         });
         setIsLoading(false);
         if(response.data) {
@@ -98,14 +99,14 @@ const UpdateEmployee = ({setIsOpenUpdateForm,setIsOpenDetailForm,employee, handl
                 </DivContent>
                 <DivContent>
                     <ContentSub isError={errors.password}>Mật Khẩu:</ContentSub>
-                    <ContentInput type="password" {...register("password", { required: true })}/>
+                    <ContentInput type="password" {...register("password")}/>
                     {(errors.password) ? <Notice>!</Notice> : ``}
                     <ContentSub>Ngày Sinh:</ContentSub>
                     <ContentInput {...register("birthday")} defaultValue={employee.birthday}/>
                 </DivContent>
                 <DivContent>
                     <ContentSub isError={errors.rePass}>Nhập Lại Mật Khẩu:</ContentSub>
-                    <ContentInput type="password" {...register("rePass", { required: true, validate: confirmPassword })}/>
+                    <ContentInput type="password" {...register("rePass", { validate: confirmPassword })}/>
                     {(errors.rePass) ? <Notice>!</Notice> : ``}
                     <ContentSub>Điện Thoại:</ContentSub>
                     <ContentInput {...register("phone")} defaultValue={employee.phone}/>

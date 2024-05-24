@@ -105,7 +105,7 @@ const Employee = () => {
             </Body>
             <BtnDiv>
                 {
-                    (page === 2) && <BtnPrevious page={page} onClick={onPrevious}>Previous</BtnPrevious>
+                    (page > 1) && <BtnPrevious page={page} onClick={onPrevious}>Previous</BtnPrevious>
                 }
                 
                 {
