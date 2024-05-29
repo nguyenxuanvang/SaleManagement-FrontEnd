@@ -15,10 +15,11 @@ import {
 } from "../add-employee/add-employee.styles";
 import productApi from "../../redux/api/product-api.slice";
 import { ContentSubP, ContentUpload, ButtonUpload, Image } from "./add-product.style";
-const AddProduct = ({onTurnOffAddForm, categories}) => {
+const AddProduct = ({setIsOpenAddForm, categories}) => {
     const [addProduct] = productApi.useAddProductMutation();
     const [file,setFile] = useState();
     const [url, setUrl] = useState();
+    const [isOpen, setIsOpen] = useState(true);
     const {
         register,
         handleSubmit,
@@ -54,8 +55,15 @@ const AddProduct = ({onTurnOffAddForm, categories}) => {
         e.preventDefault();
         fileRef.current.click();
     }
+    const onTurnOffAddForm = (e) => {
+        e.preventDefault();
+        setTimeout(()=>{
+            setIsOpenAddForm(false);
+        },500);
+        setIsOpen(false);
+    }
     return (
-        <Form onSubmit={handleSubmit(onAddProduct)}>
+        <Form onSubmit={handleSubmit(onAddProduct)} open={isOpen}>
         <Header>
             Thêm Mới Mặt Hàng
         </Header>
@@ -99,7 +107,7 @@ const AddProduct = ({onTurnOffAddForm, categories}) => {
             </DivContent>
         </Body>
         <Footer>
-            <ComeBack onClick={onTurnOffAddForm}>Quay Lại</ComeBack>
+            <ComeBack onClick={(e)=>onTurnOffAddForm(e)}>Quay Lại</ComeBack>
             <BtnEmp>Lưu</BtnEmp>
         </Footer>
     </Form>

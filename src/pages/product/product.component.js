@@ -60,9 +60,6 @@ const Product = () => {
     const onOpenAddForm = () => {
         setIsOpenAddForm(true);
     }
-    const onTurnOffAddForm = () => {
-        setIsOpenAddForm(false);
-    }
     const onSearch = () => {
         setSearch(searchRef.current.value);
         setCategory(categoryRef.current.value);
@@ -135,7 +132,7 @@ const Product = () => {
             </BtnDiv>
             {(isOpenDetailForm) && <DetailProduct page={page} onTurnOffDetailForm={onTurnOffDetailForm} onOpenUpdateForm={onOpenUpdateForm} product={product}/>}
             {(isOpenUpdateForm) && <UpdateProduct onTurnOffUpdateForm={onTurnOffUpdateForm} onTurnOffDetailForm={onTurnOffDetailForm} product={product}/>}
-            {(isOpenAddForm) && <AddProduct categories={categories.data} onTurnOffAddForm={onTurnOffAddForm}/>}
+            {(isOpenAddForm) && <AddProduct categories={categories.data} setIsOpenAddForm={setIsOpenAddForm}/>}
         </section>
     );
 }
