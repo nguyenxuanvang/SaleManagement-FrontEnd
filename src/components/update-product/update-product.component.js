@@ -22,12 +22,13 @@ import { ContentSubP } from "../add-product/add-product.style";
 import { MaHang } from "./update-product.style";
 import productApi from "../../redux/api/product-api.slice";
 import catagoryApi from "../../redux/api/catagory-api-slice";
-const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
+const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailForm,product}) => {
     const [updateProduct] = productApi.useUpdateProductMutation();
     const {data: category = {}} = catagoryApi.useGetCategoriesQuery();
     const fileRef = useRef(null);
     const [file, setFile] = useState();
     const [url, setUrl] = useState();
+    const [isOpen, setIsOpen] = useState(true);
     const {
         register,
         handleSubmit,
@@ -61,7 +62,7 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
         }
     }
     return (
-        <Form onSubmit={handleSubmit(onUpdateProduct)}>
+        <Form onSubmit={handleSubmit(onUpdateProduct)} open={isOpen}>
         <Header>
             Cập Nhật Mặt Hàng {product.product_name}
         </Header>
@@ -107,7 +108,7 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm, product}) => {
             </DivContent>
         </Body>
         <Footer>
-            <ComeBack onClick={onTurnOffUpdateForm}>Quay Lại</ComeBack>
+            <ComeBack onClick={()=>{onTurnOffUpdateForm();setIsOpenDetailForm(true)}}>Quay Lại</ComeBack>
             <BtnEmp>Lưu</BtnEmp>
         </Footer>
     </Form>

@@ -131,7 +131,7 @@ const Product = () => {
                 {(data.data?.length === 5) && <BtnNext onClick={onNext} data={data.length}>Next</BtnNext>}
             </BtnDiv>
             {(isOpenDetailForm) && <DetailProduct page={page} onTurnOffDetailForm={onTurnOffDetailForm} onOpenUpdateForm={onOpenUpdateForm} product={product}/>}
-            {(isOpenUpdateForm) && <UpdateProduct onTurnOffUpdateForm={onTurnOffUpdateForm} onTurnOffDetailForm={onTurnOffDetailForm} product={product}/>}
+            {(isOpenUpdateForm) && <UpdateProduct onTurnOffUpdateForm={onTurnOffUpdateForm} onTurnOffDetailForm={onTurnOffDetailForm} setIsOpenDetailForm={setIsOpenDetailForm} product={product}/>}
             {(isOpenAddForm) && <AddProduct categories={categories.data} setIsOpenAddForm={setIsOpenAddForm}/>}
         </section>
     );

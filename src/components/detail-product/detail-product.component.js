@@ -15,6 +15,7 @@ import {
 import Image from "../../images/kiotViett.jpg";
 import productApi from "../../redux/api/product-api.slice";
 const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) => {
+    const [isOpen, setIsOpen] = useState(true);
     const [deleteProduct] = productApi.useDeleteProductMutation();
     const [getProducts] = productApi.useLazyGetProductsQuery();
     const onDeleteProduct = async() => {
@@ -29,7 +30,7 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
         }
     }
     return (
-        <Form>
+        <Form open={isOpen}>
             <Header>Thông Tin Chi Tiết Của Mặt Hàng {product.product_name}</Header>
             <ButtonTurnOff onClick={onTurnOffDetailForm}>X</ButtonTurnOff>
             <Body>
@@ -69,7 +70,7 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
                 </div>
             </Body>
             <Footer>
-                <BtnEmp onClick={onOpenUpdateForm}>Cập Nhật</BtnEmp>
+                <BtnEmp onClick={()=>{onOpenUpdateForm();onTurnOffDetailForm()}}>Cập Nhật</BtnEmp>
                 <BtnEmp onClick={onDeleteProduct}>Xóa Mặt Hàng</BtnEmp>
             </Footer>
         </Form>
