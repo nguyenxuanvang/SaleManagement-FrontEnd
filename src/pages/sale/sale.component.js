@@ -75,7 +75,7 @@ const Sale = () => {
         }
     }
     const checkProduct = (cart,product) => {
-        const findProduct = cart.find(item => item.maHang === product.maHang);
+        const findProduct = cart.find(item => item._id === product._id);
         if(findProduct) {
             return true;
         }
@@ -87,9 +87,9 @@ const Sale = () => {
         let newCart = [...cart];
         if(checkProduct(newCart,product)) {
             for(let i = 0; i < newCart.length; i += 1) {
-                if(newCart[i].maHang === product.maHang) {
+                if(newCart[i]._id === product._id) {
                     newCart[i].quantity += 1;
-                    newCart[i].tongTien += Number(newCart[i].giaBan);
+                    newCart[i].tongTien += Number(newCart[i].sale_price);
                     break;
                 }
             }
@@ -100,7 +100,7 @@ const Sale = () => {
             let newProduct = {...product};
             newProduct.stt = newCart.length+1;
             newProduct.quantity = 1;
-            newProduct.tongTien = Number(newProduct.giaBan);
+            newProduct.tongTien = Number(newProduct.sale_price);
             newCart.push(newProduct);
             setCart(newCart);
             localStorage.setItem('cart',JSON.stringify(newCart));
@@ -121,9 +121,9 @@ const Sale = () => {
         let newCart = [...cart];
         if(ch === '+') {
             for(let i = 0; i < newCart.length; i += 1) {
-                if(newCart[i].maHang === product.maHang) {
+                if(newCart[i]._id === product._id) {
                     newCart[i].quantity += 1;
-                    newCart[i].tongTien += Number(newCart[i].giaBan);
+                    newCart[i].tongTien += Number(newCart[i].sale_price);
                     break;
                 }
             }
@@ -133,9 +133,9 @@ const Sale = () => {
         else {
             if(product.quantity > 0) {
                 for(let i = 0; i < newCart.length; i += 1) {
-                    if(newCart[i].maHang === product.maHang) {
+                    if(newCart[i]._id === product._id) {
                         newCart[i].quantity -= 1;
-                        newCart[i].tongTien -= Number(newCart[i].giaBan);
+                        newCart[i].tongTien -= Number(newCart[i].sale_price);
                         break;
                     }
                 }
@@ -178,13 +178,13 @@ const Sale = () => {
                     <LeftBodyProductList>
                         {(cart.length === 0) ? <Alert2>Thêm Sản Phẩm Muốn Mua vào Đây !</Alert2> : cart.map(item => {
                             return (
-                                <ProductRow key={item.maHang}>
+                                <ProductRow key={item._id}>
                                     <ProductRowContent style={{fontWeight: '700',color:'#666690'}}>Product</ProductRowContent>
                                     <BtnDelete onClick={() => onDelete(item)}>Delete</BtnDelete>
-                                    <ProductRowContent>H{item.maHang}</ProductRowContent>
-                                    <ProductRowContent>{item.tenHang}</ProductRowContent>
-                                    <ProductRowContent>{item.donViTinh}</ProductRowContent>
-                                    <ProductRowContent>{item.giaBan}</ProductRowContent>
+                                    <ProductRowContent>{item.category.category_name}</ProductRowContent>
+                                    <ProductRowContent>{item.product_name}</ProductRowContent>
+                                    <ProductRowContent>{item.unit}</ProductRowContent>
+                                    <ProductRowContent>{item.sale_price}</ProductRowContent>
                                     <ChangeQuantity>
                                         <BtnChangeQuantity onClick={() => {onChangeQuantity(item,'-')}}>-</BtnChangeQuantity>
                                         <ProductRowContent>{item.quantity}</ProductRowContent>
@@ -209,14 +209,14 @@ const Sale = () => {
                 <RightBody>
                     <HeaderRightBody>Admin</HeaderRightBody>
                     <ProductContainer>
-                        {(list.length === 0) ? <Alert>Không Có Sản Phẩm Nào !</Alert> : list.map(item => (
-                            <ProductDiv key={item.maHang} onClick={() => addToCart(item)}>
+                        {(list?.data?.length === 0) ? <Alert>Không Có Sản Phẩm Nào !</Alert> : list?.data?.map(item => (
+                            <ProductDiv key={item._id} onClick={() => addToCart(item)}>
                                 <ProductImage>
-                                    <Image src={item.anh}></Image>
+                                    <Image src={`http://localhost:14722/${item.image_url}`}></Image>
                                 </ProductImage>
                                 <ProductContent>
-                                    <Content>{item.tenHang}</Content>
-                                    <Content>{item.giaBan}</Content>
+                                    <Content>{item.product_name}</Content>
+                                    <Content>{item.sale_price}</Content>
                                 </ProductContent>
                             </ProductDiv>
                         ))}

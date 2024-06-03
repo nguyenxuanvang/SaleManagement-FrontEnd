@@ -11,7 +11,7 @@ import Login from './pages/login/login.component';
 import Employee from './pages/employee/employee.component';
 import Product from './pages/product/product.component';
 import Sale from './pages/sale/sale.component';
-import Order from './pages/order/order.component';
+import Order from './pages/import/import.component';
 import Home from './pages/home/home.component';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const router = createBrowserRouter([

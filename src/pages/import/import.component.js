@@ -21,7 +21,7 @@ import {
     FooterBodyRightContainer,
     FooterRightContainer,
     Notice
-} from "./order.styles";
+} from "./import.styles";
 import { 
     useState,
     useEffect
@@ -40,7 +40,7 @@ const Order = () => {
         }
     },[]);
     const onAddCart = (product) => {
-        const findProduct = cart.find(item => item.maHang === product.maHang);
+        const findProduct = cart.find(item => item._id === product._id);
         if(findProduct) {
             alert('Sản Phẩm Này Đã Tồn Tại Trong Giỏ Hàng !');
         }
@@ -54,7 +54,7 @@ const Order = () => {
     const onDelete = (product) => {
         let newCart = [...cart];
         for(let i = 0; i < newCart.length; i += 1) {
-            if(newCart[i].maHang === product.maHang) {
+            if(newCart[i]._id === product._id) {
                 newCart.splice(i,1);
                 break;
             }
@@ -72,7 +72,7 @@ const Order = () => {
     const totalPrice = (cart) => {
         let total = 0;
         for(let i = 0; i < cart.length; i += 1) {
-            total = total + Number(cart[i].giaVon)*50;
+            total = total + Number(cart[i].cost_price)*50;
         }
         return total;
     }
@@ -105,15 +105,15 @@ const Order = () => {
                         setTimeout(()=>{setIsOpenPopup('false')},150);
                     }} placeholder="Tìm Kiếm Hàng Hóa "/>
                     <Popup isfocus={isOpenPopup}>
-                        {productList.map(item => (
-                            <ItemPopup key={item.maHang} onClick={()=>onAddCart(item)}>{item.tenHang}</ItemPopup>
+                        {productList?.data?.map(item => (
+                            <ItemPopup key={item._id} onClick={()=>onAddCart(item)}>{item.product_name}</ItemPopup>
                         ))}
                     </Popup>
                 </HeaderLeftContainer>
                 <BodyLeftContainer>
                     <HeaderBodyLeftContainer>
                         <TittleHeaderBodyLeftContainer></TittleHeaderBodyLeftContainer>
-                        <TittleHeaderBodyLeftContainer>Mã Hàng</TittleHeaderBodyLeftContainer>
+                        <TittleHeaderBodyLeftContainer>Loại Hàng</TittleHeaderBodyLeftContainer>
                         <TittleHeaderBodyLeftContainer>Tên Hàng</TittleHeaderBodyLeftContainer>
                         <TittleHeaderBodyLeftContainer>ĐVT</TittleHeaderBodyLeftContainer>
                         <TittleHeaderBodyLeftContainer>Số Lượng</TittleHeaderBodyLeftContainer>
@@ -121,14 +121,14 @@ const Order = () => {
                         <TittleHeaderBodyLeftContainer>Thành Tiền</TittleHeaderBodyLeftContainer>
                     </HeaderBodyLeftContainer>
                     {cart.map(item => (
-                        <BodyBodyLeftContainer key={item.maHang}>
+                        <BodyBodyLeftContainer key={item._id}>
                             <ContentBodyLeftContainer><DeleteBtn onClick={()=>onDelete(item)}>Delete</DeleteBtn></ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.maHang}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.tenHang}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.donViTinh}</ContentBodyLeftContainer>
+                            <ContentBodyLeftContainer>{item.category.category_name}</ContentBodyLeftContainer>
+                            <ContentBodyLeftContainer>{item.product_name}</ContentBodyLeftContainer>
+                            <ContentBodyLeftContainer>{item.unit}</ContentBodyLeftContainer>
                             <ContentBodyLeftContainer>50</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.giaVon}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{Number(item.giaVon)*50}</ContentBodyLeftContainer>
+                            <ContentBodyLeftContainer>{item.cost_price}</ContentBodyLeftContainer>
+                            <ContentBodyLeftContainer>{Number(item.cost_price)*50}</ContentBodyLeftContainer>
                         </BodyBodyLeftContainer>
                     ))}
                 </BodyLeftContainer>
@@ -143,10 +143,10 @@ const Order = () => {
                     <HeaderBodyRightContainer>Hóa Đơn Nhập Hàng</HeaderBodyRightContainer>
                     <BodyBodyRightContainer>
                         {(cart.length === 0) ? <Notice>Chưa Có Gì Trong Giỏ Hàng</Notice> : cart.map(item => (
-                            <RowBodyRightContainer key={item.maHang}>
-                                <p>{item.tenHang}</p>
+                            <RowBodyRightContainer key={item._id}>
+                                <p>{item.product_name}</p>
                                 <p>50</p>
-                                <p>{Number(item.giaVon)*50}</p>
+                                <p>{Number(item.cost_price)*50}</p>
                         </RowBodyRightContainer>
                         ))}
                     </BodyBodyRightContainer>
