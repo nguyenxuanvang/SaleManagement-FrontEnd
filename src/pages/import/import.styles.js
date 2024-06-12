@@ -33,8 +33,8 @@ export const Popup = styled.div`
     background-color: #fff;
     width: 200px;
     height: 100px;
-    top: 28px;
-    right: 245px;
+    top: 32px;
+    right: 210px;
     border: 1px solid black;
     border-radius: 10px;
     overflow: hidden;
@@ -57,6 +57,9 @@ export const BodyLeftContainer = styled.div`
 export const HeaderBodyLeftContainer = styled.div`
     display: flex;
     border-bottom: 3px solid
+`;
+export const InputQuantity = styled.input`
+    width: 50px;
 `;
 export const DeleteBtn = styled.button`
     padding: 5px;

@@ -14,12 +14,16 @@ import {
     Notice
 } from "../add-employee/add-employee.styles";
 import productApi from "../../redux/api/product-api.slice";
-import { ContentSubP, ContentUpload, ButtonUpload, Image } from "./add-product.style";
-const AddProduct = ({setIsOpenAddForm, categories}) => {
+import catagoryApi from "../../redux/api/catagory-api-slice";
+import { ContentSubP, ContentUpload, ButtonUpload, Image, BtnAdd, InputCategory } from "./add-product.style";
+const AddProduct = ({setIsOpenAddForm, listCategory:categories}) => {
     const [addProduct] = productApi.useAddProductMutation();
+    const [createCategory] = catagoryApi.useLazyCreateCategoryQuery();
     const [file,setFile] = useState();
     const [url, setUrl] = useState();
     const [isOpen, setIsOpen] = useState(true);
+    const [isOpenAddCategory, setIsOpenAddCategory] = useState(false);
+    const categoryRef = useRef(null);
     const {
         register,
         handleSubmit,
@@ -35,6 +39,7 @@ const AddProduct = ({setIsOpenAddForm, categories}) => {
             }
             formData.append('image',file);
         }
+        product.tonKho = 0;
         formData.append('product',JSON.stringify(product));
         const response = await addProduct(formData);
         if(response.data) {
@@ -45,6 +50,25 @@ const AddProduct = ({setIsOpenAddForm, categories}) => {
             alert('Thêm Thất Bại!');  
         }
     }
+    const onOpenAddCategory = (e) => {
+        e.preventDefault();
+        setIsOpenAddCategory(true);
+    }
+    const onAddCategory = async(e) => {
+        e.preventDefault();
+        if(categoryRef.current.value) {
+            const res = await createCategory({category_name: categoryRef.current.value});
+            if(res.data) {
+                setIsOpenAddCategory(false);
+            } else {
+                alert(res.error.data.message);
+            }
+            
+        } else {
+            alert('Category Name Is Not Null !');
+        }
+    }
+    
     useEffect(()=>{
         if(file) {
             const url = URL.createObjectURL(file);
@@ -56,7 +80,9 @@ const AddProduct = ({setIsOpenAddForm, categories}) => {
         fileRef.current.click();
     }
     const onTurnOffAddForm = (e) => {
-        e.preventDefault();
+        if(e) {
+            e.preventDefault();
+        }
         setTimeout(()=>{
             setIsOpenAddForm(false);
         },500);
@@ -79,13 +105,21 @@ const AddProduct = ({setIsOpenAddForm, categories}) => {
             </DivContent>
             <DivContent>
                 <ContentSub isError={errors.nhomHang}>Nhóm Hàng:</ContentSub>
+                
                     <select {...register("nhomHang", { required: true })}>
                         <option></option>
                         {categories.map(item => (
                             <option key={item._id} value={item._id}>{item.category_name}</option>
                         ))}
-                        
                     </select>
+                    {(!isOpenAddCategory) ? <BtnAdd onClick={(e)=>{onOpenAddCategory(e)}}>+</BtnAdd> : 
+                    <div>
+                        <InputCategory placeholder="Nhập Tên Loại Hàng" ref={categoryRef} />
+                        <button onClick={(e)=>{e.preventDefault();setIsOpenAddCategory(false)}}>Cancel</button>
+                        <button onClick={(e)=>{onAddCategory(e)}}>Ok</button>
+                    </div>
+                    
+                    }
                 {(errors.nhomHang) ? <Notice>!</Notice> : ``}
                 <ContentSubP isError={errors.giaBan}>Giá Bán:</ContentSubP>
                 <ContentInput type='number' {...register("giaBan", { required: true })}/>
@@ -96,9 +130,9 @@ const AddProduct = ({setIsOpenAddForm, categories}) => {
                 {(url) && <Image src={(url) ? url : ''}/>}
                 <ContentUpload type="file" accept="image/*" ref={fileRef} onChange={(e)=>(e.target.files[0])&&setFile(e.target.files[0])}/>
                 <ButtonUpload onClick={(e)=>onUpload(e)}>Upload Ảnh</ButtonUpload>
-                <ContentSub isError={errors.tonKho}>Tồn Kho:</ContentSub>
+                {/* <ContentSub isError={errors.tonKho}>Tồn Kho:</ContentSub>
                 <ContentInput type='number' {...register("tonKho", { required: true })}/>
-                {(errors.tonKho) ? <Notice>!</Notice> : ``}
+                {(errors.tonKho) ? <Notice>!</Notice> : ``} */}
             </DivContent>
             <DivContent>
                 <ContentSub isError={errors.donViTinh}>Đơn Vị Tính:</ContentSub>

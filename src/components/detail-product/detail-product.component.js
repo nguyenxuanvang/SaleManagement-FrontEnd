@@ -12,7 +12,6 @@ import {
     Footer,
     BtnEmp
 } from "./detail-product.styles";
-import Image from "../../images/kiotViett.jpg";
 import productApi from "../../redux/api/product-api.slice";
 const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -21,6 +20,13 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
     const onDeleteProduct = async() => {
         const response = await deleteProduct(product._id);
         if(response.data) {
+            const cart = JSON.parse(localStorage.getItem('inputCart'));
+            const newCart = cart.filter(item => {
+                if(item._id !== response.data.data._id) {
+                    return item;
+                }
+            })
+            localStorage.setItem('inputCart',JSON.stringify(newCart));
             getProducts({page});
             alert('Xóa Thành Công!');
             onTurnOffDetailForm();

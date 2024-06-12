@@ -49,10 +49,18 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailF
             }
             formData.append('image',file);
         }
-        const changeProduct = {...newProduct,_id:product._id,image_url: product.image_url};
+        const changeProduct = {...newProduct,_id:product._id,image_url: product.image_url,quantity: product.quantity};
         formData.append('product',JSON.stringify(changeProduct));
         const response = await updateProduct(formData);
         if(response.data) {
+            const cart = JSON.parse(localStorage.getItem('inputCart'));
+            const newCart = cart.map(item => {
+                if(item._id === response.data.data._id) {
+                    return {...response.data.data,quantity:(response.data.data.quantity===0)?1:response.data.data.quantity}
+                }
+                return item;
+            })
+            localStorage.setItem('inputCart',JSON.stringify(newCart));
             alert('Cập Nhật Thành Công!');
             onTurnOffUpdateForm();
             onTurnOffDetailForm();
@@ -73,7 +81,7 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailF
                 <MaHang>{product._id}</MaHang>
                 {(errors._id) ? <Notice>!</Notice> : ``}
                 <ContentSub isError={errors.cost_price}>Giá Vốn:</ContentSub>
-                <ContentInput {...register("cost_price", { required: true })} defaultValue={product.cost_price}/>
+                <ContentInput {...register("cost_price", { required: true })} defaultValue={product.cost_price} type="number"/>
                 {(errors.cost_price) ? <Notice>!</Notice> : ``}
             </DivContent>
             <DivContent>
@@ -81,7 +89,7 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailF
                 <ContentInput {...register("product_name", { required: true })} defaultValue={product.product_name}/>
                 {(errors.product_name) ? <Notice>!</Notice> : ``}
                 <ContentSub isError={errors.sale_price}>Giá Bán:</ContentSub>
-                <ContentInput {...register("sale_price", { required: true })} defaultValue={product.sale_price}/>
+                <ContentInput {...register("sale_price", { required: true })} defaultValue={product.sale_price} type="number"/>
                 {(errors.sale_price) ? <Notice>!</Notice> : ``}
             </DivContent>
             <DivContent>
@@ -92,9 +100,8 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailF
                     ))}
                 </select>
                 {(errors.category) ? <Notice>!</Notice> : ``}
-                <ContentSubP isError={errors.quantity}>Tồn Kho:</ContentSubP>
-                <ContentInput {...register("quantity", { required: true })} defaultValue={product.quantity}/>
-                {(errors.quantity) ? <Notice>!</Notice> : ``}
+                <ContentSubP>Tồn Kho:</ContentSubP>
+                <ContentInput defaultValue={product.quantity} disabled/>
             </DivContent>
             <DivContent>
                 <ContentSub isError={errors.image_url}>Ảnh:</ContentSub>

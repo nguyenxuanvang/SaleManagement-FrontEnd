@@ -8,14 +8,14 @@ import {
     BtnSearch,
     SearchIcon,
     SearchEmp,
-    BtnAddEmp,
     HeaderBody,
     TitleHeader,
     BodyBody,
     Alert,
     BtnDiv,
     BtnNext,
-    BtnPrevious
+    BtnPrevious,
+    OverLay
 } from "../employee/employee.styles";
 import { 
     PBody,
@@ -25,7 +25,6 @@ import {
 } from "./product.styles";
 import DetailProduct from "../../components/detail-product/detail-product.component";
 import UpdateProduct from "../../components/update-product/update-product.component";
-import AddProduct from "../../components/add-product/add-product.component";
 import searchIcon from "../../icons/search.png";
 import productApi from "../../redux/api/product-api.slice";
 import catagoryApi from "../../redux/api/catagory-api-slice";
@@ -34,7 +33,6 @@ const Product = () => {
     const {data: categories = []} = catagoryApi.useGetCategoriesQuery();
     const [isOpenDetailForm, setIsOpenDetailForm] = useState(false);
     const [isOpenUpdateForm, setIsOpenUpdateForm] = useState(false);
-    const [isOpenAddForm, setIsOpenAddForm] = useState(false);
     const [product, setProduct] = useState();
     const [category, setCategory] = useState('');
     const [search, setSearch] = useState('');
@@ -56,9 +54,6 @@ const Product = () => {
     }
     const onTurnOffUpdateForm = () => {
         setIsOpenUpdateForm(false);
-    }
-    const onOpenAddForm = () => {
-        setIsOpenAddForm(true);
     }
     const onSearch = () => {
         setSearch(searchRef.current.value);
@@ -101,7 +96,6 @@ const Product = () => {
                 <BtnSearch onClick={onSearch}>
                     <SearchIcon src={searchIcon}/>
                 </BtnSearch>
-                <BtnAddEmp onClick={onOpenAddForm}>Thêm Hàng</BtnAddEmp>
             </Header>
             <PBody>
                 {(data.data?.length !== 0) ? <HeaderBody>
@@ -130,9 +124,9 @@ const Product = () => {
                 {(page > 1) && <BtnPrevious onClick={onPrevious} page={page}>Previous</BtnPrevious>}
                 {(data.data?.length === 5) && <BtnNext onClick={onNext} data={data.length}>Next</BtnNext>}
             </BtnDiv>
+            {(isOpenDetailForm || isOpenUpdateForm) && <OverLay/>}
             {(isOpenDetailForm) && <DetailProduct page={page} onTurnOffDetailForm={onTurnOffDetailForm} onOpenUpdateForm={onOpenUpdateForm} product={product}/>}
             {(isOpenUpdateForm) && <UpdateProduct onTurnOffUpdateForm={onTurnOffUpdateForm} onTurnOffDetailForm={onTurnOffDetailForm} setIsOpenDetailForm={setIsOpenDetailForm} product={product}/>}
-            {(isOpenAddForm) && <AddProduct categories={categories.data} setIsOpenAddForm={setIsOpenAddForm}/>}
         </section>
     );
 }

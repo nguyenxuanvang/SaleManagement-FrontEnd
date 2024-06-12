@@ -23,3 +23,11 @@ export const Image = styled.img`
     height: 100px;
     width: 100px;
 `;
+export const BtnAdd = styled.button`
+    padding: 5px;
+    border: none;
+    margin-left: 5px;
+`;
+export const InputCategory = styled.input`
+    margin-left: 5px;
+`;

@@ -8,6 +8,7 @@ import {
     ItemPopup,
     BodyLeftContainer,
     HeaderBodyLeftContainer,
+    InputQuantity,
     DeleteBtn,
     TittleHeaderBodyLeftContainer,
     BodyBodyLeftContainer,
@@ -22,16 +23,25 @@ import {
     FooterRightContainer,
     Notice
 } from "./import.styles";
+import {
+    BtnAddEmp,
+} from "../employee/employee.styles";
 import { 
     useState,
     useEffect
 } from "react";
+import AddProduct from "../../components/add-product/add-product.component";
+import ProductImport from "../../components/product-import/product-import.component";
 import productApi from "../../redux/api/product-api.slice";
+import catagoryApi from "../../redux/api/catagory-api-slice";
+import importApi from "../../redux/api/import-api-slice";
 const Order = () => {
     const [isOpenPopup,setIsOpenPopup] = useState('false');
     const [cart,setCart] = useState([]);
+    const [isOpenAddForm, setIsOpenAddForm] = useState(false);
     const [getProducts,{data:productList = []}] = productApi.useLazyGetProductsQuery();
-    const [orderProducts] = productApi.useOrderProductsMutation();
+    const {data: categories = []} = catagoryApi.useGetCategoriesQuery();
+    const [importProducts] = importApi.useImportProductsMutation();
     const today = new Date();
     useEffect(()=>{
         getProducts();
@@ -39,6 +49,12 @@ const Order = () => {
             setCart(JSON.parse(localStorage.getItem('inputCart')));
         }
     },[]);
+    const onOpenAddForm = () => {
+        setIsOpenAddForm(true);
+    }
+    const onSearch = (e) => {
+        getProducts({search: e.target.value})
+    }
     const onAddCart = (product) => {
         const findProduct = cart.find(item => item._id === product._id);
         if(findProduct) {
@@ -46,33 +62,23 @@ const Order = () => {
         }
         else {
             let newCart = [...cart];
-            newCart.push(product);
+            newCart.push({...product,quantity: 1});
             setCart(newCart);
             localStorage.setItem('inputCart',JSON.stringify(newCart));
         }
     }
-    const onDelete = (product) => {
-        let newCart = [...cart];
-        for(let i = 0; i < newCart.length; i += 1) {
-            if(newCart[i]._id === product._id) {
-                newCart.splice(i,1);
-                break;
-            }
-        }
-        setCart(newCart);
-        localStorage.setItem('inputCart',JSON.stringify(newCart));
-    }
+    
     const totalQuantity = (cart) => {
         let total = 0;
         for(let i = 0; i < cart.length; i += 1) {
-            total = total + 50;
+            total = total + cart[i].quantity;
         }
         return total;
     }
     const totalPrice = (cart) => {
         let total = 0;
         for(let i = 0; i < cart.length; i += 1) {
-            total = total + Number(cart[i].cost_price)*50;
+            total = total + Number(cart[i].cost_price)*cart[i].quantity;
         }
         return total;
     }
@@ -85,14 +91,14 @@ const Order = () => {
             alert('Giỏ Hàng Trống !');
         }
         else {
-            const response = await orderProducts(cart);
+            const response = await importProducts({cart,totalQuantity:totalQuantity(cart),totalPrice:totalPrice(cart)});
             if(response.data) {
-                alert('Thanh Toán Thành Công !');
+                alert(response.data.message);
                 setCart([]);
                 localStorage.setItem('inputCart','[]');
             }
             else {
-                alert('Thanh Toán Thất Bại !');
+                alert(response.error.data.message);
             }
         }
     }
@@ -100,10 +106,11 @@ const Order = () => {
         <Container>
             <LeftContainer>
                 <HeaderLeftContainer>
+                    <BtnAddEmp onClick={onOpenAddForm}>Thêm Hàng</BtnAddEmp>
                     <PLeftContainer>Tìm Kiếm Hàng Hóa:</PLeftContainer>
                     <InputLeftContainer onFocus={() => setIsOpenPopup('true')} onBlur={() => {
                         setTimeout(()=>{setIsOpenPopup('false')},150);
-                    }} placeholder="Tìm Kiếm Hàng Hóa "/>
+                    }} placeholder="Tìm Kiếm Hàng Hóa " onChange={(e) => {onSearch(e)}}/>
                     <Popup isfocus={isOpenPopup}>
                         {productList?.data?.map(item => (
                             <ItemPopup key={item._id} onClick={()=>onAddCart(item)}>{item.product_name}</ItemPopup>
@@ -121,15 +128,7 @@ const Order = () => {
                         <TittleHeaderBodyLeftContainer>Thành Tiền</TittleHeaderBodyLeftContainer>
                     </HeaderBodyLeftContainer>
                     {cart.map(item => (
-                        <BodyBodyLeftContainer key={item._id}>
-                            <ContentBodyLeftContainer><DeleteBtn onClick={()=>onDelete(item)}>Delete</DeleteBtn></ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.category.category_name}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.product_name}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.unit}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>50</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{item.cost_price}</ContentBodyLeftContainer>
-                            <ContentBodyLeftContainer>{Number(item.cost_price)*50}</ContentBodyLeftContainer>
-                        </BodyBodyLeftContainer>
+                        <ProductImport item={item} key={item._id} cart={cart} setCart={setCart}/>
                     ))}
                 </BodyLeftContainer>
             </LeftContainer>
@@ -145,8 +144,8 @@ const Order = () => {
                         {(cart.length === 0) ? <Notice>Chưa Có Gì Trong Giỏ Hàng</Notice> : cart.map(item => (
                             <RowBodyRightContainer key={item._id}>
                                 <p>{item.product_name}</p>
-                                <p>50</p>
-                                <p>{Number(item.cost_price)*50}</p>
+                                <p>{item.quantity}</p>
+                                <p>{Number(item.cost_price)*item.quantity}</p>
                         </RowBodyRightContainer>
                         ))}
                     </BodyBodyRightContainer>
@@ -161,6 +160,7 @@ const Order = () => {
                     <button onClick={onOrder}>Thanh Toán</button>
                 </FooterRightContainer>
             </RightContainer>
+            {(isOpenAddForm) && <AddProduct listCategory={categories.data} setIsOpenAddForm={setIsOpenAddForm}/>}
         </Container>
     );
 }
