@@ -89,13 +89,13 @@ const productApi = apiSlice.injectEndpoints({
                 }
             }
         }),
-        orderProducts: builder.mutation({
-            query: cart => ({
-                url: '/orderProducts',
-                method: 'PATCH',
-                body: cart
-            })
-        }),
+        // orderProducts: builder.mutation({
+        //     query: cart => ({
+        //         url: '/orderProducts',
+        //         method: 'PATCH',
+        //         body: cart
+        //     })
+        // }),
         deleteProduct: builder.mutation({
             query: id => ({
                 url: '/product',

@@ -20,13 +20,20 @@ const DetailProduct = ({page, onTurnOffDetailForm, onOpenUpdateForm, product}) =
     const onDeleteProduct = async() => {
         const response = await deleteProduct(product._id);
         if(response.data) {
-            const cart = JSON.parse(localStorage.getItem('inputCart'));
-            const newCart = cart.filter(item => {
+            const inputCart = JSON.parse(localStorage.getItem('inputCart'));
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const newInputCart = inputCart.filter(item => {
                 if(item._id !== response.data.data._id) {
                     return item;
                 }
-            })
-            localStorage.setItem('inputCart',JSON.stringify(newCart));
+            });
+            const newCart = cart.filter(cartItem => {
+                if(cartItem._id !== response.data.data._id) {
+                    return cartItem;
+                }
+            });
+            localStorage.setItem('inputCart',JSON.stringify(newInputCart));
+            localStorage.setItem('cart',JSON.stringify(newCart));
             getProducts({page});
             alert('Xóa Thành Công!');
             onTurnOffDetailForm();

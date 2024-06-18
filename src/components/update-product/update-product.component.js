@@ -53,14 +53,27 @@ const UpdateProduct = ({onTurnOffUpdateForm,onTurnOffDetailForm,setIsOpenDetailF
         formData.append('product',JSON.stringify(changeProduct));
         const response = await updateProduct(formData);
         if(response.data) {
-            const cart = JSON.parse(localStorage.getItem('inputCart'));
-            const newCart = cart.map(item => {
+            const inputCart = JSON.parse(localStorage.getItem('inputCart'));
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const newInputCart = inputCart.map(item => {
                 if(item._id === response.data.data._id) {
                     return {...response.data.data,quantity:(response.data.data.quantity===0)?1:response.data.data.quantity}
                 }
                 return item;
             })
-            localStorage.setItem('inputCart',JSON.stringify(newCart));
+            const newCart = cart.map(cartItem => {
+                if(cartItem._id === response.data.data._id) {
+                    return {
+                        ...response.data.data,
+                        quantityP: cartItem.quantityP,
+                        stt: cartItem.stt,
+                        tongTien: Number(cartItem.quantityP)*Number(response.data.data.sale_price)
+                    }
+                }
+                return cartItem;
+            })
+            localStorage.setItem('inputCart',JSON.stringify(newInputCart));
+            localStorage.setItem('cart',JSON.stringify(newCart));
             alert('Cập Nhật Thành Công!');
             onTurnOffUpdateForm();
             onTurnOffDetailForm();

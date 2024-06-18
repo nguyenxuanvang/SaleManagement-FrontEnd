@@ -35,21 +35,25 @@ import {
 } from "./sale.styles";
 import searchIcon from '../../icons/search.png';
 import productApi from "../../redux/api/product-api.slice";
+import orderApi from "../../redux/api/order-api-slice";
 import { 
     useEffect,
+    useRef,
     useState
 } from "react";
 const Sale = () => {
     const [getProducts,{data: list = []}] = productApi.useLazyGetProductsQuery();
-    const [updateProducts] = productApi.useUpdateProductsMutation();
+    const [orderProducts] = orderApi.useOrderProductsMutation();
     const [cart,setCart] = useState([]);
     const [search, setSearch] = useState('');
+    const noteRef = useRef(null);
     useEffect(()=>{
         getProducts();
         if(localStorage.getItem('cart')){
            setCart(JSON.parse(localStorage.getItem('cart')));
         }
     },[]);
+    
     const toTalPrice = (cart) => {
         if(cart.length > 0) {
             let total = 0;
@@ -66,7 +70,7 @@ const Sale = () => {
         if(cart.length > 0) {
             let total = 0;
             for(let i = 0; i < cart.length; i += 1) {
-                total += cart[i].quantity;
+                total += cart[i].quantityP;
             }
             return total;
         }
@@ -75,41 +79,40 @@ const Sale = () => {
         }
     }
     const checkProduct = (cart,product) => {
-        const findProduct = cart.find(item => item._id === product._id);
-        if(findProduct) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        const findIndex = cart.findIndex(item => item._id === product._id);
+        return findIndex;
     }
     const addToCart = (product) => {
         let newCart = [...cart];
-        if(checkProduct(newCart,product)) {
-            for(let i = 0; i < newCart.length; i += 1) {
-                if(newCart[i]._id === product._id) {
-                    newCart[i].quantity += 1;
-                    newCart[i].tongTien += Number(newCart[i].sale_price);
-                    break;
-                }
+        let findIndex = checkProduct(newCart,product);
+        if(findIndex !== -1) {
+            if(newCart[findIndex].quantityP < newCart[findIndex].quantity) {
+                newCart[findIndex].quantityP += 1;
+                newCart[findIndex].tongTien += Number(newCart[findIndex].sale_price); 
+                setCart(newCart);
+                localStorage.setItem('cart',JSON.stringify(newCart));
+            } else {
+                alert(newCart[findIndex].product_name + ' only has a maximum of ' + newCart[findIndex].quantity + ' in stock !');
             }
-            setCart(newCart);
-            localStorage.setItem('cart',JSON.stringify(newCart));
         }
         else {
-            let newProduct = {...product};
-            newProduct.stt = newCart.length+1;
-            newProduct.quantity = 1;
-            newProduct.tongTien = Number(newProduct.sale_price);
-            newCart.push(newProduct);
-            setCart(newCart);
-            localStorage.setItem('cart',JSON.stringify(newCart));
+            if(product.quantity > 0) {
+                let newProduct = {...product};
+                newProduct.stt = newCart.length+1;
+                newProduct.quantityP = 1;
+                newProduct.tongTien = Number(newProduct.sale_price);
+                newCart.push(newProduct);
+                setCart(newCart);
+                localStorage.setItem('cart',JSON.stringify(newCart));
+            } else {
+                alert(product.product_name + ' is out of stock !');
+            }
         }
     }
     const onDelete = (product) => {
         let newCart = [...cart];
         for(let i = 0; i < newCart.length; i += 1) {
-            if(newCart[i].maHang === product.maHang) {
+            if(newCart[i]._id === product._id) {
                 newCart.splice(i,1);
                 break;
             }
@@ -120,21 +123,25 @@ const Sale = () => {
     const onChangeQuantity = (product,ch) => {
         let newCart = [...cart];
         if(ch === '+') {
-            for(let i = 0; i < newCart.length; i += 1) {
-                if(newCart[i]._id === product._id) {
-                    newCart[i].quantity += 1;
-                    newCart[i].tongTien += Number(newCart[i].sale_price);
-                    break;
-                }
-            }
-            setCart(newCart);
-            localStorage.setItem('cart',JSON.stringify(newCart));
-        }
-        else {
-            if(product.quantity > 0) {
+            if(product.quantityP < product.quantity) {
                 for(let i = 0; i < newCart.length; i += 1) {
                     if(newCart[i]._id === product._id) {
-                        newCart[i].quantity -= 1;
+                        newCart[i].quantityP += 1;
+                        newCart[i].tongTien += Number(newCart[i].sale_price);
+                        break;
+                    }
+                }
+                setCart(newCart);
+                localStorage.setItem('cart',JSON.stringify(newCart));
+            } else {
+                alert(product.product_name + ' only has a maximum of ' + product.quantity + ' in stock !');
+            }
+        }
+        else {
+            if(product.quantityP > 1) {
+                for(let i = 0; i < newCart.length; i += 1) {
+                    if(newCart[i]._id === product._id) {
+                        newCart[i].quantityP -= 1;
                         newCart[i].tongTien -= Number(newCart[i].sale_price);
                         break;
                     }
@@ -149,11 +156,13 @@ const Sale = () => {
     }
     const onBuy = async (cart) => {
         if(cart.length > 0) {
-            const response = await updateProducts(cart);
+            const response = await orderProducts({cart,totalQuantity: totalQuantity(cart), totalPrice: toTalPrice(cart),note: noteRef.current.innerText});
             if(response.data) {
                 setCart([]);
                 localStorage.setItem('cart','[]');
-                alert('Thanh Toán Thành Công !');
+                alert(response.data.message);
+            } else {
+                alert(response.error.data.message);
             }
         }
         else {
@@ -187,7 +196,7 @@ const Sale = () => {
                                     <ProductRowContent>{item.sale_price}</ProductRowContent>
                                     <ChangeQuantity>
                                         <BtnChangeQuantity onClick={() => {onChangeQuantity(item,'-')}}>-</BtnChangeQuantity>
-                                        <ProductRowContent>{item.quantity}</ProductRowContent>
+                                        <ProductRowContent>{item.quantityP}</ProductRowContent>
                                         <BtnChangeQuantity onClick={() => {onChangeQuantity(item,'+')}}>+</BtnChangeQuantity>
                                     </ChangeQuantity>
                                     <ProductRowContent>{item.tongTien}</ProductRowContent>
@@ -197,7 +206,7 @@ const Sale = () => {
                         <NoticeTotal>
                             <Notice>
                                 <NoticeTitle>Ghi Chú Hóa Đơn</NoticeTitle>
-                                <NoticeInput contentEditable="true"></NoticeInput>
+                                <NoticeInput contentEditable="true" ref={noteRef}></NoticeInput>
                             </Notice>
                             <Total>
                                 <TotalContent>Tổng Tiền Hàng:</TotalContent>
