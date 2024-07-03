@@ -2,27 +2,43 @@ import apiSlice from "./api.slice";
 import { current } from "@reduxjs/toolkit";
 const orderApi = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        orderProducts: builder.mutation({
-            query: info => ({
+        getOrders: builder.query({
+            serializeQueryArgs: () => {
+                return undefined;
+            },
+            query: (filter) => ({
                 url: '/order',
-                method: 'POST',
-                body: info
+                params: filter
+            })
+        }),
+        getOrderDetails: builder.query({
+            serializeQueryArgs: () => {
+                return undefined;
+            },
+            query: (id) => ({
+                url: `/order/${id}`
+            })
+        }),
+        deleteOrder: builder.mutation({
+            query: (args) => ({
+                url: `/order`,
+                method: 'DELETE',
+                body: args
             }),
-            async onQueryStarted(info, { dispatch, queryFulfilled }) {
-                const action = apiSlice.util.updateQueryData('getProducts', undefined, draft => {
-                    for(let i = 0; i < info.cart.length; i += 1) {
-                       let findProduct = draft.data.find(item => item._id === info.cart[i]._id);
-                       findProduct.quantity -= info.cart[i].quantityP;
-                    }
-                });
-                const patchResult = dispatch(action);
+            async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 try {
-                    await queryFulfilled;
-                } catch {
-                    patchResult.undo();
-                }
+                    const response = await queryFulfilled;
+                    if(response.data) {
+                        const action = apiSlice.util.updateQueryData('getOrders', undefined, draft => {
+                           draft.data = response.data.data;
+                        });
+                        dispatch(action);
+                    }
+                } catch(e) {
+                    console.log(e);
+                }  
             }
-        }), 
+        })
     })
 });
 export default orderApi;

@@ -35,7 +35,7 @@ import ProductImport from "../../components/product-import/product-import.compon
 import productApi from "../../redux/api/product-api.slice";
 import catagoryApi from "../../redux/api/catagory-api-slice";
 import importApi from "../../redux/api/import-api-slice";
-const Order = () => {
+const Import = () => {
     const [isOpenPopup,setIsOpenPopup] = useState('false');
     const [cart,setCart] = useState([]);
     const [isOpenAddForm, setIsOpenAddForm] = useState(false);
@@ -164,4 +164,4 @@ const Order = () => {
         </Container>
     );
 }
-export default Order;
+export default Import;

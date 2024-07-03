@@ -42,6 +42,7 @@ const Template = () => {
                 <Link to = '/importProduct' location = {location.pathname}>Nhập Hàng</Link>
                 <Link to = '/employee' location = {location.pathname}>Nhân Viên</Link>
                 <Link to = '/sale' location = {location.pathname}>Bán Hàng</Link>
+                <Link to = '/order' location = {location.pathname}>Hóa Đơn</Link>
                 <SectionUser>
                     <User>
                         <ImageUser src={userIcon} alt="Avt"/>

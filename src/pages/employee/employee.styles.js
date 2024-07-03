@@ -3,6 +3,7 @@ export const Header = styled.div`
     display: flex;
     margin-left: 150px;
     margin-top: 15px;
+    gap: 10px;
 `;
 export const BtnSearch = styled.button`
     width: 32px;

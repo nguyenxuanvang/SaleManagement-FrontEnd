@@ -35,7 +35,7 @@ import {
 } from "./sale.styles";
 import searchIcon from '../../icons/search.png';
 import productApi from "../../redux/api/product-api.slice";
-import orderApi from "../../redux/api/order-api-slice";
+import saleApi from "../../redux/api/sale-api-slice";
 import { 
     useEffect,
     useRef,
@@ -43,7 +43,7 @@ import {
 } from "react";
 const Sale = () => {
     const [getProducts,{data: list = []}] = productApi.useLazyGetProductsQuery();
-    const [orderProducts] = orderApi.useOrderProductsMutation();
+    const [orderProducts] = saleApi.useSaleProductsMutation();
     const [cart,setCart] = useState([]);
     const [search, setSearch] = useState('');
     const noteRef = useRef(null);
