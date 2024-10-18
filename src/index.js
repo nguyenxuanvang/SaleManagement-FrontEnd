@@ -69,4 +69,3 @@ root.render(
 //change from remote
 //bonus test change
 //change from remote 1
-//test rebase 1
